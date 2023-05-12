@@ -104,4 +104,4 @@ theme: landscape
 deploy:
   type: git
   repo: https://github.com/wen-gp/wen-gp.github.io.git
-  branch: main
+  branch: master
