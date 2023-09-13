@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title>C#原生Excel操作</title>
+    <url>/2023/09/11/C-%E5%8E%9F%E7%94%9FExcel%E6%93%8D%E4%BD%9C/</url>
+    <content><![CDATA[<p>首先要引入Microsoft.Office.Interop.Excel.dll<br>引入后，下面是代码示例</p>
+<figure class="highlight c#"><table><tr><td class="code"><pre><span class="line"><span class="keyword">using</span> Microsoft.Office.Interop.Excel;</span><br><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"><span class="keyword">using</span> System.Reflection;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">ConsoleApp3</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ExcelGenerator</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Test</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">public</span> <span class="built_in">string</span> TableName &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125;</span><br><span class="line">            <span class="keyword">public</span> <span class="built_in">string</span> ColumnName &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125;</span><br><span class="line">            <span class="keyword">public</span> <span class="built_in">string</span> AssociatedTableName &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125;</span><br><span class="line">            <span class="keyword">public</span> <span class="built_in">string</span> AssociatedColumnName &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125;</span><br><span class="line">            <span class="keyword">public</span> <span class="built_in">string</span> Remarks &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="built_in">bool</span> <span class="title">TryCreateExcel</span>()</span></span><br><span class="line">        &#123;</span><br><span class="line">            Application app = <span class="literal">default</span>;</span><br><span class="line">            Workbook wb = <span class="literal">default</span>;</span><br><span class="line">            Worksheet ws = <span class="literal">default</span>;</span><br><span class="line">            <span class="keyword">try</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="comment">//初始化</span></span><br><span class="line">                app = <span class="keyword">new</span> Application();</span><br><span class="line">                <span class="keyword">if</span> (app == <span class="literal">null</span>)</span><br><span class="line">                    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">                wb = app.Workbooks.Add(<span class="literal">true</span>);</span><br><span class="line">                ws = (Worksheet)wb.Sheets.get_Item(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">                <span class="comment">//获取数据</span></span><br><span class="line">                <span class="built_in">bool</span> isSuccess = TryGetExcel(<span class="keyword">out</span> List&lt;Test&gt; datas);</span><br><span class="line">                <span class="keyword">if</span>(!isSuccess)</span><br><span class="line">                    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">                <span class="comment">//生成头部</span></span><br><span class="line">                ws.Cells[<span class="number">1</span>, <span class="number">1</span>] = <span class="string">&quot;表格名称&quot;</span>;</span><br><span class="line">                ws.Cells[<span class="number">1</span>, <span class="number">2</span>] = <span class="string">&quot;列名称&quot;</span>;</span><br><span class="line">                ws.Cells[<span class="number">1</span>, <span class="number">3</span>] = <span class="string">&quot;关联表格名称&quot;</span>;</span><br><span class="line">                ws.Cells[<span class="number">1</span>, <span class="number">4</span>] = <span class="string">&quot;关联列名称&quot;</span>;</span><br><span class="line">                ws.Cells[<span class="number">1</span>, <span class="number">5</span>] = <span class="string">&quot;备注&quot;</span>;</span><br><span class="line"></span><br><span class="line">                <span class="comment">//生成数据</span></span><br><span class="line">                <span class="built_in">int</span> rowIndex = <span class="number">2</span>;</span><br><span class="line">                <span class="keyword">foreach</span> (<span class="keyword">var</span> data <span class="keyword">in</span> datas)</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="keyword">for</span> (<span class="built_in">int</span> columnIndex = <span class="number">1</span>; columnIndex &lt;= <span class="number">5</span>; columnIndex++)</span><br><span class="line">                    &#123;</span><br><span class="line">                        <span class="keyword">switch</span> (columnIndex)</span><br><span class="line">                        &#123;</span><br><span class="line">                            <span class="keyword">case</span> <span class="number">1</span>: ws.Cells[rowIndex, columnIndex] = data.TableName; <span class="keyword">break</span>;</span><br><span class="line">                            <span class="keyword">case</span> <span class="number">2</span>: ws.Cells[rowIndex, columnIndex] = data.ColumnName; <span class="keyword">break</span>;</span><br><span class="line">                            <span class="keyword">case</span> <span class="number">3</span>: ws.Cells[rowIndex, columnIndex] = data.AssociatedTableName; <span class="keyword">break</span>;</span><br><span class="line">                            <span class="keyword">case</span> <span class="number">4</span>: ws.Cells[rowIndex, columnIndex] = data.AssociatedColumnName; <span class="keyword">break</span>;</span><br><span class="line">                            <span class="keyword">case</span> <span class="number">5</span>:</span><br><span class="line">                                &#123;</span><br><span class="line">                                    <span class="keyword">switch</span> (data.ColumnName)</span><br><span class="line">                                    &#123;</span><br><span class="line">                                        <span class="keyword">case</span> <span class="string">&quot;GGQAAG&quot;</span>: ws.Cells[rowIndex, columnIndex] = <span class="string">&quot;工程项目编号&quot;</span>; <span class="keyword">break</span>;</span><br><span class="line">                                        <span class="keyword">case</span> <span class="string">&quot;PKE&quot;</span>: ws.Cells[rowIndex, columnIndex] = <span class="string">&quot;勘察阶段&quot;</span>; <span class="keyword">break</span>;</span><br><span class="line">                                        <span class="keyword">case</span> <span class="string">&quot;GCJBMC&quot;</span>: ws.Cells[rowIndex, columnIndex] = <span class="string">&quot;工程区名称&quot;</span>; <span class="keyword">break</span>;</span><br><span class="line">                                        <span class="keyword">case</span> <span class="string">&quot;GCJCBN&quot;</span>: ws.Cells[rowIndex, columnIndex] = <span class="string">&quot;边坡编号&quot;</span>; <span class="keyword">break</span>;</span><br><span class="line">                                        <span class="keyword">case</span> <span class="string">&quot;MDLAVA&quot;</span>: ws.Cells[rowIndex, columnIndex] = <span class="string">&quot;地质点号&quot;</span>; <span class="keyword">break</span>;</span><br><span class="line">                                        <span class="keyword">case</span> <span class="string">&quot;DWJCBH&quot;</span>: ws.Cells[rowIndex, columnIndex] = <span class="string">&quot;监测点编号&quot;</span>; <span class="keyword">break</span>;</span><br><span class="line">                                        <span class="keyword">case</span> <span class="string">&quot;DSFND&quot;</span>: ws.Cells[rowIndex, columnIndex] = <span class="string">&quot;大层编号&quot;</span>; <span class="keyword">break</span>;</span><br><span class="line">                                        <span class="keyword">case</span> <span class="string">&quot;DSFYC&quot;</span>: ws.Cells[rowIndex, columnIndex] = <span class="string">&quot;地层编号&quot;</span>; <span class="keyword">break</span>;                                           </span><br><span class="line">                                    &#125;</span><br><span class="line">                                &#125;</span><br><span class="line">                                <span class="keyword">break</span>;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                    rowIndex++;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="comment">//保存</span></span><br><span class="line">                wb.Saved = <span class="literal">true</span>;</span><br><span class="line">                wb.SaveCopyAs(<span class="string">&quot;C:\\Users\\EDY\\Desktop\\表1.xlsx&quot;</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">catch</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">finally</span></span><br><span class="line">            &#123;</span><br><span class="line">                wb.Close();</span><br><span class="line">                <span class="keyword">if</span> (app != <span class="literal">null</span>)</span><br><span class="line">                &#123;</span><br><span class="line">                    app.Workbooks.Close();</span><br><span class="line">                    app.Quit();</span><br><span class="line">                    <span class="built_in">int</span> generation = GC.GetGeneration(app);</span><br><span class="line">                    System.Runtime.InteropServices.Marshal.ReleaseComObject(app);</span><br><span class="line">                    app = <span class="literal">null</span>;</span><br><span class="line">                    GC.Collect(generation);</span><br><span class="line">                &#125;</span><br><span class="line">                GC.Collect();<span class="comment">//强行销毁</span></span><br><span class="line">                System.Diagnostics.Process[] excelProc = System.Diagnostics.Process.GetProcessesByName(<span class="string">&quot;EXCEL&quot;</span>);</span><br><span class="line">                DateTime startTime = <span class="keyword">new</span> DateTime();</span><br><span class="line">                <span class="built_in">int</span> m, killId = <span class="number">0</span>;</span><br><span class="line">                <span class="keyword">if</span> (excelProc.Length &gt; <span class="number">0</span>)</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="keyword">for</span> (m = <span class="number">0</span>; m &lt; excelProc.Length; m++)</span><br><span class="line">                    &#123;</span><br><span class="line">                        <span class="keyword">if</span> (startTime &lt; excelProc[m].StartTime)</span><br><span class="line">                        &#123;</span><br><span class="line">                            startTime = excelProc[m].StartTime;</span><br><span class="line">                            killId = m;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">if</span> (excelProc[killId].HasExited == <span class="literal">false</span>)</span><br><span class="line">                        excelProc[killId].Kill();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="built_in">bool</span> <span class="title">TryGetExcel</span>(<span class="params"><span class="keyword">out</span> List&lt;Test&gt; datas</span>)</span></span><br><span class="line">        &#123;</span><br><span class="line">            datas = <span class="keyword">new</span> List&lt;Test&gt;();</span><br><span class="line">            Application app = <span class="literal">default</span>;</span><br><span class="line">            Workbook wb = <span class="literal">default</span>;</span><br><span class="line">            Worksheet ws = <span class="literal">default</span>;</span><br><span class="line">            <span class="keyword">try</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="comment">//初始化</span></span><br><span class="line">                app = <span class="keyword">new</span> Application();</span><br><span class="line">                <span class="built_in">object</span> m = Missing.Value;</span><br><span class="line">                wb = app.Workbooks.Open(<span class="string">@&quot;C:\Users\EDY\Desktop\外键信息表.xlsx&quot;</span>, m, <span class="literal">true</span>, m, m, m, m, m, m, <span class="literal">true</span>, m, m, m, m, m);</span><br><span class="line">                ws = wb.Worksheets.get_Item(<span class="number">1</span>);</span><br><span class="line">                <span class="built_in">int</span> rowCount = ws.UsedRange.Cells.Rows.Count;</span><br><span class="line">                <span class="built_in">int</span> columnCount = ws.UsedRange.Cells.Columns.Count;</span><br><span class="line"></span><br><span class="line">                <span class="comment">//获取数据</span></span><br><span class="line">                <span class="keyword">for</span> (<span class="built_in">int</span> rowIndex = <span class="number">2</span>; rowIndex &lt;= rowCount; rowIndex++)</span><br><span class="line">                &#123;</span><br><span class="line">                    Test test = <span class="keyword">new</span> Test();</span><br><span class="line">                    <span class="keyword">for</span> (<span class="built_in">int</span> columnIndex = <span class="number">1</span>; columnIndex &lt;= columnCount; columnIndex++)</span><br><span class="line">                    &#123;</span><br><span class="line">                        <span class="keyword">switch</span> (columnIndex)</span><br><span class="line">                        &#123;</span><br><span class="line">                            <span class="keyword">case</span> <span class="number">1</span>: test.TableName = ws.Cells[rowIndex, columnIndex].Value; <span class="keyword">break</span>;</span><br><span class="line">                            <span class="keyword">case</span> <span class="number">2</span>: test.ColumnName = ws.Cells[rowIndex, columnIndex].Value; <span class="keyword">break</span>;</span><br><span class="line">                            <span class="keyword">case</span> <span class="number">3</span>: test.AssociatedTableName = ws.Cells[rowIndex, columnIndex].Value; <span class="keyword">break</span>;</span><br><span class="line">                            <span class="keyword">case</span> <span class="number">4</span>: test.AssociatedColumnName = ws.Cells[rowIndex, columnIndex].Value; <span class="keyword">break</span>;</span><br><span class="line">                            <span class="keyword">case</span> <span class="number">5</span>: test.Remarks = ws.Cells[rowIndex, columnIndex].Value; <span class="keyword">break</span>;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                    datas.Add(test);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">catch</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">finally</span></span><br><span class="line">            &#123;</span><br><span class="line">                wb.Close();</span><br><span class="line">                <span class="keyword">if</span> (app != <span class="literal">null</span>)</span><br><span class="line">                &#123;</span><br><span class="line">                    app.Workbooks.Close();</span><br><span class="line">                    app.Quit();</span><br><span class="line">                    <span class="built_in">int</span> generation = GC.GetGeneration(app);</span><br><span class="line">                    System.Runtime.InteropServices.Marshal.ReleaseComObject(app);</span><br><span class="line">                    app = <span class="literal">null</span>;</span><br><span class="line">                    GC.Collect(generation);</span><br><span class="line">                &#125;</span><br><span class="line">                GC.Collect();<span class="comment">//强行销毁</span></span><br><span class="line">                System.Diagnostics.Process[] excelProc = System.Diagnostics.Process.GetProcessesByName(<span class="string">&quot;EXCEL&quot;</span>);</span><br><span class="line">                DateTime startTime = <span class="keyword">new</span> DateTime();</span><br><span class="line">                <span class="built_in">int</span> m, killId = <span class="number">0</span>;</span><br><span class="line">                <span class="keyword">if</span> (excelProc.Length &gt; <span class="number">0</span>)</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="keyword">for</span> (m = <span class="number">0</span>; m &lt; excelProc.Length; m++)</span><br><span class="line">                    &#123;</span><br><span class="line">                        <span class="keyword">if</span> (startTime &lt; excelProc[m].StartTime)</span><br><span class="line">                        &#123;</span><br><span class="line">                            startTime = excelProc[m].StartTime;</span><br><span class="line">                            killId = m;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">if</span> (excelProc[killId].HasExited == <span class="literal">false</span>)</span><br><span class="line">                        excelProc[killId].Kill();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>计算机</category>
+      </categories>
+      <tags>
+        <tag>C#</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>C#操作浏览器的步骤</title>
+    <url>/2023/09/06/C-%E6%93%8D%E4%BD%9C%E6%B5%8F%E8%A7%88%E5%99%A8%E7%9A%84%E6%AD%A5%E9%AA%A4/</url>
+    <content><![CDATA[<h1 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h1><p>假设我要使用 C# 模拟使用浏览器进行操作，可以使用 Selenium WebDriver。Selenium 是一个自动化测试工具，其中 WebDriver 是用于模拟浏览器行为的部分。<br>首先，需要安装 Selenium WebDriver。可以使用 NuGet 包管理器来安装 Selenium.WebDriver 包。<br>接下来，可以使用以下代码模拟使用浏览器访问 Google 并进行搜索 “测试操作”：</p>
+<figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">using</span> OpenQA.Selenium;</span><br><span class="line"><span class="keyword">using</span> OpenQA.Selenium.Chrome;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title">Program</span> &#123;</span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"><span class="built_in">string</span>[] args</span>)</span> &#123;</span><br><span class="line">        <span class="comment">// 创建 ChromeDriver 实例</span></span><br><span class="line">        IWebDriver driver = <span class="keyword">new</span> ChromeDriver();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// 打开 Google</span></span><br><span class="line">            driver.Navigate().GoToUrl(<span class="string">&quot;https://www.google.com/&quot;</span>);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 定位搜索框元素并输入查询内容</span></span><br><span class="line">            IWebElement searchBox = driver.FindElement(By.Name(<span class="string">&quot;q&quot;</span>));<span class="comment">//这一步也可以使用By.Id()</span></span><br><span class="line">            searchBox.SendKeys(<span class="string">&quot;测试操作&quot;</span>);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 提交搜索</span></span><br><span class="line">            searchBox.Submit();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception ex) &#123;</span><br><span class="line">            Console.WriteLine(ex.Message);</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            <span class="comment">// 关闭浏览器</span></span><br><span class="line">            driver.Quit();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在上面的代码中，我们创建了一个 ChromeDriver 的实例，它将使用 Chrome 浏览器进行模拟。然后，我们导航到 Google 的网址，找到搜索框元素，并向其发送搜索字符串 “测试操作”。最后，我们提交搜索并关闭浏览器。<br>注意，这个示例假设您已经安装了 Chrome 浏览器，同时还需要根据您的操作系统下载和设置适用于 Chrome 的 WebDriver。</p>
+<h1 id="其他控件怎么填入数据？"><a href="#其他控件怎么填入数据？" class="headerlink" title="其他控件怎么填入数据？"></a>其他控件怎么填入数据？</h1><pre><code>不同类型的控件有不同的操作方法来填入或选择内容。以下是一些常见的控件和相应的操作方法：
+</code></pre>
+<ol>
+<li><p>文本框 (Text Box):<br>使用 SendKeys 方法来输入文本内容。</p>
+</li>
+<li><p>下拉框 (Dropdown):<br>如果是下拉框元素，可以使用 SelectElement 类来选择值。例如：</p>
+<figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line">SelectElement dropdown = <span class="keyword">new</span> SelectElement(driver.FindElement(By.Id(<span class="string">&quot;dropdown&quot;</span>)));</span><br><span class="line">dropdown.SelectByText(<span class="string">&quot;Option 1&quot;</span>);  <span class="comment">// 通过可见文本选择选项</span></span><br><span class="line">dropdown.SelectByValue(<span class="string">&quot;value1&quot;</span>);  <span class="comment">// 通过值选择选项</span></span><br><span class="line">dropdown.SelectByIndex(<span class="number">2</span>);         <span class="comment">// 通过索引选择选项</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>复选框 (Checkbox):<br>通过调用 IWebElement.Click() 方法来选中&#x2F;取消选中复选框。例如：</p>
+<figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line">IWebElement checkbox = driver.FindElement(By.Id(<span class="string">&quot;checkbox&quot;</span>));</span><br><span class="line">checkbox.Click();  <span class="comment">// 选中</span></span><br><span class="line">checkbox.Click();  <span class="comment">// 取消选中</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>单选按钮 (Radio Button):<br>通过调用 IWebElement.Click() 方法来选择单选按钮。例如：</p>
+<figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line">IWebElement radioButton = driver.FindElement(By.Id(<span class="string">&quot;radioButton&quot;</span>));</span><br><span class="line">radioButton.Click();</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>按钮 (Button):<br>通过调用 IWebElement.Click() 方法来点击按钮。例如：</p>
+<figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line">IWebElement button = driver.FindElement(By.Id(<span class="string">&quot;button&quot;</span>));</span><br><span class="line">button.Click();</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>回退</p>
+<figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line">driver.Navigate().Back(); </span><br></pre></td></tr></table></figure>
+<p>请注意，以上示例假设您已经定位到了相应的元素，方法的参数可以根据实际情况进行修改。另外，还可以使用其他方法和属性来处理不同类型的控件，具体操作取决于您所使用的自动化测试工具和页面的结构。</p>
+</li>
+</ol>
+<h1 id="如何提交，searchBox-Submit-是怎么回事，为什么不是点击某个按钮的操作，类似xxx-Click"><a href="#如何提交，searchBox-Submit-是怎么回事，为什么不是点击某个按钮的操作，类似xxx-Click" class="headerlink" title="如何提交，searchBox.Submit() 是怎么回事，为什么不是点击某个按钮的操作，类似xxx.Click()"></a>如何提交，searchBox.Submit() 是怎么回事，为什么不是点击某个按钮的操作，类似xxx.Click()</h1><p>如果您要提交，的确通常是点击某个提交按钮，使用 xxx.Click() 方法来模拟点击操作，其中 xxx 表示您定位到的相应元素。<br>在上述示例代码中，我们调用 searchBox.Submit() 方法时，它实际上会自动触发搜索框所在表单（form）的提交操作。对于标准的搜索表单，按下回车键或点击 “搜索” 按钮都会触发提交操作。</p>
+<p>如果您想点击页面上的其他提交按钮，可以按照以下步骤进行操作：<br>定位到要点击的提交按钮元素。<br>使用 Click() 方法来模拟点击操作。<br>例如，假设您要点击一个 id 为 “submitButton” 的提交按钮，可以使用以下代码：</p>
+<figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line">IWebElement submitButton = driver.FindElement(By.Id(<span class="string">&quot;submitButton&quot;</span>));</span><br><span class="line">submitButton.Click();</span><br></pre></td></tr></table></figure>
+<p>通过 Click() 方法，您可以模拟用户点击按钮的行为，从而触发相应的操作或页面跳转。请根据您所测试的具体情况，定位到正确的元素并使用适当的方法进行操作。</p>
+]]></content>
+      <categories>
+        <category>计算机</category>
+      </categories>
+      <tags>
+        <tag>C#</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>NANA亲启</title>
+    <url>/2023/07/12/NANA%E4%BA%B2%E5%90%AF/</url>
+    <content><![CDATA[<div class="gallery-group-main">
+
+  <figure class="gallery-group">
+  <img class="gallery-group-img no-lightbox" src='/image/%E9%87%8E%E8%89%AF%E7%A5%9E.jpg' alt="Group Image Gallery">
+  <figcaption>
+  <div class="gallery-group-name">NANA亲启</div>
+  <p>呀呀~~~~只有nana可以点开</p>
+  <a href='/example/NANA.html'></a>
+  </figcaption>
+  </figure>
+  
+</div>]]></content>
+      <categories>
+        <category>恋爱</category>
+      </categories>
+      <tags>
+        <tag>恋爱的酸臭味</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Winform如何在DataGridForm的Cell中添加控件</title>
+    <url>/2023/09/07/Winform%E5%A6%82%E4%BD%95%E5%9C%A8DataGridForm%E7%9A%84Cell%E4%B8%AD%E6%B7%BB%E5%8A%A0%E6%8E%A7%E4%BB%B6/</url>
+    <content><![CDATA[<figure class="highlight c#"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">InsertControl</span>()</span></span><br><span class="line">&#123;</span><br><span class="line">    Button btn = <span class="keyword">new</span> Button();</span><br><span class="line">    btn.Text = <span class="string">&quot;...&quot;</span>;</span><br><span class="line">    <span class="comment">//获取DataGridView的第7列和当前选中的行的cell的Rectangle</span></span><br><span class="line">    Rectangle rect = dgvSetting.GetCellDisplayRectangle(<span class="number">7</span>, dgvSetting.CurrentCell.RowIndex, <span class="literal">true</span>);</span><br><span class="line">    btn.Location = <span class="keyword">new</span> Point(rect.Right - <span class="number">35</span>, rect.Top);<span class="comment">//获取该cell的位置并给btn</span></span><br><span class="line">    btn.Size = <span class="keyword">new</span> Size(<span class="number">35</span>, rect.Height);<span class="comment">//获取该cell的大小并给btn</span></span><br><span class="line">    dgvSetting.Controls.Add(btn);<span class="comment">//放入DataGridView的Control</span></span><br><span class="line">    btn.Show();<span class="comment">//展示该控件</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>计算机</category>
+      </categories>
+      <tags>
+        <tag>C#</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>winform如何只生成一个exe文件？</title>
+    <url>/2023/07/17/winform%E5%A6%82%E4%BD%95%E5%8F%AA%E7%94%9F%E6%88%90%E4%B8%80%E4%B8%AAexe%E6%96%87%E4%BB%B6%EF%BC%9F/</url>
+    <content><![CDATA[<p>我写了一份代码，但是我不想弄一个安装包出来，而是给客户时我只想给一个exe文件，但是debug后生成的总是一个文件夹，里面包含了各种dll，怎么破?<br>step1:通过NuGet 安装ILmerge和MSBuild.ILMerge.Task<br>step2:重新生成即可</p>
+]]></content>
+      <categories>
+        <category>计算机</category>
+      </categories>
+      <tags>
+        <tag>C#</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>C#如何去重</title>
+    <url>/2023/09/05/C-%E5%A6%82%E4%BD%95%E5%8E%BB%E9%87%8D/</url>
+    <content><![CDATA[<h1 id="C-如何去重"><a href="#C-如何去重" class="headerlink" title="C#如何去重"></a>C#如何去重</h1><figure class="highlight c#"><table><tr><td class="code"><pre><span class="line">users.Where((x,i)=&gt;users.FindIndex(s=&gt;s.name==x.name)==i).ToList();</span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>计算机</category>
+      </categories>
+      <tags>
+        <tag>C#</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>九月</title>
+    <url>/2023/08/11/%E4%B9%9D%E6%9C%88/</url>
+    <content><![CDATA[<pre><code>九月了啊，是啊，已经九月了。有人问我，恋爱之后有什么变化吗？有的，但是变得怎么样了？我也说不出来，仿佛一点点地褪去了稚嫩，开始变得有计划了。
+</code></pre>
+]]></content>
+      <categories>
+        <category>恋爱</category>
+      </categories>
+      <tags>
+        <tag>恋爱的酸臭味</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>这里是我们的相册哇</title>
+    <url>/2023/07/12/%E8%BF%99%E9%87%8C%E6%98%AF%E6%88%91%E4%BB%AC%E7%9A%84%E7%9B%B8%E5%86%8C%E5%93%87/</url>
+    <content><![CDATA[<div class="gallery-group-main">
+
+  <figure class="gallery-group">
+  <img class="gallery-group-img no-lightbox" src='/image/%E4%BA%91%E5%A0%87.jpg' alt="Group Image Gallery">
+  <figcaption>
+  <div class="gallery-group-name">拽拽的和酷酷的</div>
+  <p>拽拽的和酷酷的</p>
+  <a href='/gallery/%E6%8B%BD%E6%8B%BD%E7%9A%84%E5%92%8C%E9%85%B7%E9%85%B7%E7%9A%84'></a>
+  </figcaption>
+  </figure>
+  
+</div>
+<div class="gallery-group-main">
+
+  <figure class="gallery-group">
+  <img class="gallery-group-img no-lightbox" src='/image/%E4%BA%91%E5%A0%87.jpg' alt="Group Image Gallery">
+  <figcaption>
+  <div class="gallery-group-name">拽拽的和酷酷的</div>
+  <p>明信片版</p>
+  <a href='/example/photo.html'></a>
+  </figcaption>
+  </figure>
+  
+</div>
+<div class="gallery-group-main">
+
+  <figure class="gallery-group">
+  <img class="gallery-group-img no-lightbox" src='/image/%E9%A3%8E%E6%99%AF.jpg' alt="Group Image Gallery">
+  <figcaption>
+  <div class="gallery-group-name">过年</div>
+  <p>过年</p>
+  <a href='/video/%E8%BF%87%E5%B9%B4.mp4'></a>
+  </figcaption>
+  </figure>
+  
+</div>
+<div class="gallery-group-main">
+
+  <figure class="gallery-group">
+  <img class="gallery-group-img no-lightbox" src='/image/%E9%A3%8E%E6%99%AF.jpg' alt="Group Image Gallery">
+  <figcaption>
+  <div class="gallery-group-name">广告</div>
+  <p>广告</p>
+  <a href='/video/%E5%B9%BF%E5%91%8A.mp4'></a>
+  </figcaption>
+  </figure>
+  
+</div>
+<div class="gallery-group-main">
+
+  <figure class="gallery-group">
+  <img class="gallery-group-img no-lightbox" src='/image/%E9%A3%8E%E6%99%AF.jpg' alt="Group Image Gallery">
+  <figcaption>
+  <div class="gallery-group-name">广告</div>
+  <p>广告</p>
+  <a href='/example/%E5%B9%BF%E5%91%8A.html'></a>
+  </figcaption>
+  </figure>
+  
+</div>]]></content>
+      <categories>
+        <category>恋爱</category>
+      </categories>
+      <tags>
+        <tag>恋爱的酸臭味</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>遇见你，真好</title>
+    <url>/2023/07/14/%E9%81%87%E8%A7%81%E4%BD%A0%EF%BC%8C%E7%9C%9F%E5%A5%BD/</url>
+    <content><![CDATA[<p>和小姚第一次相遇是在什么时候？小温忘了，时间好长，过去也好久，听小温妈妈说要追溯到幼儿园的时候，“有一次啊，我送你们这群小孩子去上学，但是小姚她奶奶老是迟到，都不是一次两次了，我就不想惯着她，这次经过她家一看，果然又没来，我就……”，说了一半却哈哈大笑了起来，小温忙追问：“然后呢，然后怎么了？”，“然后啊，就……”<br>然后啊，就一晃就过去了二十多年。<br>小温和小姚再也没有交集过，仿佛彼此已经忘了小时候的这个玩伴，时间与空间慢慢将他们拉远，两人只是两条交线，彼此间的拥有只存在于这一点的罢了，直到有一天，她忽然出现在小温的眼前。</p>
+<h3 id="起"><a href="#起" class="headerlink" title="起"></a>起</h3><p>“小温啊，你明天帮忙载一下妈妈姐妹的女儿上班好不好啊。”小温的妈妈开门进来说到，“她和你工作的地方还蛮近的。”<br>“不想，我没那么多时间啊。”放下手机，小温说到，小端午骂骂咧咧地走了进来，跳上床露出了肚皮。小温顺手搓了搓它的猫头。<br>“而且我上班时间很早的，和她对不上吧。”<br>“哎呀你帮一下忙嘛，老妈都和他们说好了。”<br>哎，真够麻烦的，八竿子打不着的姐妹，小温心想到明天还要带个拖油瓶就感觉脑仁疼<br>“那行吧，她在那呢？”<br>“就在家辉的婚礼上，走我带你去见她们。”，小温妈妈说到，顺手捏住了小端午的后颈脖提了起来，伴随着小端午骂骂咧咧的声音下了楼。</p>
+<h3 id="承"><a href="#承" class="headerlink" title="承"></a>承</h3><p>好吧，小温承认，此女的确有几分姿色，竟能只凭一个笑容就引得自己心动不已，哼哼很好，女人，你成功吸引了我的注意。<br>星期一早上，一路正经。<br>星期二早上，没关系，以前也是一个人上班的。<br>星期三早上，没关系，以前也是一个人上班的。<br>星期四早上，小温呀小温，你怎么能如此堕落，以后要专心工作，不要再想她了。<br>星期五早上，嘻嘻，礼拜五了，叫小姚一起下班嘿嘿。<br>“哇，你还买了这么多东西。”<br>“那必然的呀，毕竟不能白坐你的车嘛。”<br>“那好，那我不客气了。”（帅哥干饭）“歪，25号是我的生日，我叫了奥奥哥哥他们，你一起来吧。”<br>“啊？我？！！……好吧。”</p>
+<h3 id="转"><a href="#转" class="headerlink" title="转"></a>转</h3><p>夜深人静，小温辗转难安，这或许是他这一生最大的一个难题，虽然此时并没确定关系，但今晚无疑是对小温的一个巨大的打击。<br>“对不起了，我可能要食言了。”<br>“你怎么啦？”<br>小姚开头这句话就给小温带来了莫大的危机感，但小温这句话发出去后犹如泥牛入海一样。<br>过了好久，小姚才发来一句：“我老爸不让我退房子。”<br>小温也不知道怎么回她，不知怎的，一向谨慎的他竟然一反常态地说到：“没关系呀，那就不退了，但是我们要每天一起减肥！”<br>“好！一起减肥。”</p>
+<h3 id="合"><a href="#合" class="headerlink" title="合"></a>合</h3><p>“歪！”<br>“干嘛啊？”<br>“你看那儿。”<br>“玫瑰？”<br>“嗯。”<br>“玫瑰怎么啦。”<br>“嗯~也没什么啦，就是今天是11月11号欸”<br>“嗯，11月11号怎么啦？”<br>“我有个提议，我们假装情侣怎么样？”<br>“啊？”</p>
+<h3 id="番外"><a href="#番外" class="headerlink" title="番外"></a>番外</h3><p>“歪，你相信天上有神仙嘛？”<br>“干嘛问这个？”<br>“你信不信嘛！”<br>“不信，我是个坚定的共产党员，不相信封建迷信。”<br>“哦哦哦~所以你是说把我们拉在一起的是马克思！！！”<br>“歪，巴嘎我不是这个意思啦！”<br>（完）</p>
+]]></content>
+      <categories>
+        <category>恋爱</category>
+      </categories>
+      <tags>
+        <tag>恋爱的酸臭味</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>资源下载</title>
+    <url>/2023/09/13/%E8%B5%84%E6%BA%90%E4%B8%8B%E8%BD%BD/</url>
+    <content><![CDATA[<h1 id="普通文件"><a href="#普通文件" class="headerlink" title="普通文件"></a>普通文件</h1><p><a href="/download/Hexo+Github.docx">Hexo+Github搭建自己的专属博客</a></p>
+<h1 id="游戏"><a href="#游戏" class="headerlink" title="游戏"></a>游戏</h1><p><a href="/download/CE_7.5%E4%B8%AD%E6%96%87%E7%89%88.zip">CE_7.5中文版</a></p>
+]]></content>
+      <categories>
+        <category>资源下载</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>C#多线程</title>
+    <url>/2023/08/16/%E5%A4%9A%E7%BA%BF%E7%A8%8B/</url>
+    <content><![CDATA[<h1 id="Task"><a href="#Task" class="headerlink" title="Task"></a>Task</h1><h2 id="Task如何开启多线程"><a href="#Task如何开启多线程" class="headerlink" title="Task如何开启多线程"></a>Task如何开启多线程</h2><p>以下为Task创建多线程的三种方法，个人比较推荐使用方法3</p>
+<figure class="highlight c#"><table><tr><td class="code"><pre><span class="line"><span class="comment">//方法1:创建task后使用Start()启动</span></span><br><span class="line">Task task = <span class="keyword">new</span> Task(() =&gt;</span><br><span class="line">&#123;</span><br><span class="line">    Console.WriteLine(<span class="string">$&quot;01:这里开启了一个线程：线程ID: <span class="subst">&#123;Thread.CurrentThread.ManagedThreadId.ToString(<span class="string">&quot;00&quot;</span>)&#125;</span>&quot;</span>);</span><br><span class="line">&#125;);</span><br><span class="line">task.Start();</span><br><span class="line"></span><br><span class="line"><span class="comment">//方法2:直接Run</span></span><br><span class="line">Task.Run(() =&gt;</span><br><span class="line">&#123;</span><br><span class="line">    Console.WriteLine(<span class="string">$&quot;02:这里开启了一个线程：线程ID: <span class="subst">&#123;Thread.CurrentThread.ManagedThreadId.ToString(<span class="string">&quot;00&quot;</span>)&#125;</span>&quot;</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">//方法3:使用Factory</span></span><br><span class="line">Task.Factory.StartNew(() =&gt;</span><br><span class="line">&#123;</span><br><span class="line">    Console.WriteLine(<span class="string">$&quot;03:这里开启了一个线程：线程ID: <span class="subst">&#123;Thread.CurrentThread.ManagedThreadId.ToString(<span class="string">&quot;00&quot;</span>)&#125;</span>&quot;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<h2 id="Task的线程等待和延续"><a href="#Task的线程等待和延续" class="headerlink" title="Task的线程等待和延续"></a>Task的线程等待和延续</h2><p>Task下的线程等待和延续主要以下几类：</p>
+<ol>
+<li>Wait：针对单个Task的实例，可以task.Wait()进行线程等待. (实例方法)<figure class="highlight c#"><table><tr><td class="code"><pre><span class="line">Task task = Task task = <span class="keyword">new</span> Task(() =&gt;</span><br><span class="line">&#123;</span><br><span class="line">    Console.WriteLine(<span class="string">$&quot;01:这里开启了一个线程：线程ID: <span class="subst">&#123;Thread.CurrentThread.ManagedThreadId.ToString(<span class="string">&quot;00&quot;</span>)&#125;</span>&quot;</span>);</span><br><span class="line">&#125;);</span><br><span class="line">task.Start();</span><br><span class="line">task.Wait();</span><br></pre></td></tr></table></figure></li>
+<li>WaitAny：执行的线程等待其中任何一个线程执行完毕即可执行(如果主线程执行,则卡主线程)(Task的静态方法)<figure class="highlight c#"><table><tr><td class="code"><pre><span class="line">List&lt;Task&gt; taskList = <span class="keyword">new</span> List&lt;Task&gt;();</span><br><span class="line">taskList.Add(factory.StartNew(o =&gt; Console.WriteLine(<span class="number">1</span>), <span class="string">&quot;1&quot;</span>));</span><br><span class="line">taskList.Add(factory.StartNew(o =&gt; Console.WriteLine(<span class="number">2</span>), <span class="string">&quot;2&quot;</span>));</span><br><span class="line">Task.WaitAny(taskList.ToArray());</span><br></pre></td></tr></table></figure></li>
+<li>WaitAll：执行的线程等待其中所有线程执行完毕方可执行(如果主线程执行,则卡主线程)(Task的静态方法)<figure class="highlight c#"><table><tr><td class="code"><pre><span class="line">List&lt;Task&gt; taskList = <span class="keyword">new</span> List&lt;Task&gt;();</span><br><span class="line">taskList.Add(factory.StartNew(o =&gt; Console.WriteLine(<span class="number">1</span>), <span class="string">&quot;1&quot;</span>));</span><br><span class="line">taskList.Add(factory.StartNew(o =&gt; Console.WriteLine(<span class="number">2</span>), <span class="string">&quot;2&quot;</span>));</span><br><span class="line">Task.WaitAll(taskList.ToArray());</span><br></pre></td></tr></table></figure></li>
+<li>WhenAny + ContinueWith：与ContinueWith配合执行,当传入的线程中任何一个线程执行完毕，继续执行ContinueWith中的任务(属于开启新线程，不卡主线程)(Task的静态方法)<figure class="highlight c#"><table><tr><td class="code"><pre><span class="line">List&lt;Task&gt; taskList = <span class="keyword">new</span> List&lt;Task&gt;();</span><br><span class="line">taskList.Add(factory.StartNew(o =&gt; Console.WriteLine(<span class="number">1</span>), <span class="string">&quot;1&quot;</span>));</span><br><span class="line">taskList.Add(factory.StartNew(o =&gt; Console.WriteLine(<span class="number">2</span>), <span class="string">&quot;2&quot;</span>));</span><br><span class="line">Task.WhenAny(taskList.ToArray()).ContinueWith((m)=&gt;</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//做一些操作</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></li>
+<li>WhenAll + ContinueWith：与ContinueWith配合执行,当传入的线程中所有线程执行完毕，继续执行ContinueWith中的任务(属于开启新线程，不卡主线程)(Task的静态方法)<figure class="highlight c#"><table><tr><td class="code"><pre><span class="line">List&lt;Task&gt; taskList = <span class="keyword">new</span> List&lt;Task&gt;();</span><br><span class="line">taskList.Add(factory.StartNew(o =&gt; Console.WriteLine(<span class="number">1</span>), <span class="string">&quot;1&quot;</span>));</span><br><span class="line">taskList.Add(factory.StartNew(o =&gt; Console.WriteLine(<span class="number">2</span>), <span class="string">&quot;2&quot;</span>));</span><br><span class="line">Task.WhenAll(taskList.ToArray()).ContinueWith((m)=&gt;</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//做一些操作</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></li>
+</ol>
+]]></content>
+      <categories>
+        <category>计算机</category>
+      </categories>
+      <tags>
+        <tag>C#</tag>
+      </tags>
+  </entry>
+</search>
