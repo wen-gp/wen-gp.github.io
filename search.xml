@@ -264,8 +264,33 @@
       </tags>
   </entry>
   <entry>
-    <title>Http与Https</title>
+    <title>HTTP与HTTPS</title>
     <url>/2023/12/28/HTTP%E4%B8%8EHTTPS/</url>
-    <content><![CDATA[]]></content>
+    <content><![CDATA[<h1 id="HTTP"><a href="#HTTP" class="headerlink" title="HTTP"></a>HTTP</h1><p>暂时不说</p>
+<h1 id="HTTPS"><a href="#HTTPS" class="headerlink" title="HTTPS"></a>HTTPS</h1><h2 id="HTTPS是什么？"><a href="#HTTPS是什么？" class="headerlink" title="HTTPS是什么？"></a>HTTPS是什么？</h2><p><strong>HTTPS 协议（HyperText Transfer Protocol over Secure Socket Layer）：可以理解为HTTP+SSL&#x2F;TLS，HTTPS中的“S”是指SSL，可以认为HTTPS是通过SSL加密后再用HTTP来传输的协议。</strong></p>
+<h3 id="SSL是什么，客户端和服务器之间传输数据时是怎么通过SSL加密的？"><a href="#SSL是什么，客户端和服务器之间传输数据时是怎么通过SSL加密的？" class="headerlink" title="SSL是什么，客户端和服务器之间传输数据时是怎么通过SSL加密的？"></a>SSL是什么，客户端和服务器之间传输数据时是怎么通过SSL加密的？</h3><p><strong>SSL（Secure Socket Layer，安全套接字层）：1994年为Netscape所研发，SSL协议位于TCP&#x2F;IP协议与各种应用层协议之间，为数据通讯提供安全支持，而客户端与服务器之间则是这么加密的：</strong></p>
+<ol>
+<li>首先客户端通过URL访问服务器建立SSL连接。</li>
+<li>服务端收到客户端请求后，会将网站支持的证书信息（证书中包含公钥）传送一份给客户端。</li>
+<li>客户端建立会话密钥，然后利用网站的公钥将会话密钥加密，并传送给网站。</li>
+<li>服务器利用自己的私钥解密出会话密钥。</li>
+<li>服务器利用会话密钥加密与客户端之间的通信。</li>
+</ol>
+<p><strong>对上面的步骤，我再来用“间谍”和“组织”来更形象地解释一下</strong></p>
+<ol>
+<li>首先，间谍向组织请求说想要向组织获取一个情报。</li>
+<li>组织收到间谍的请求后，将一个带锁的“箱子A”（公钥）发给间谍，同时他自己手里打造了一把“钥匙A”（私钥）。</li>
+<li>间谍收到箱子后，把自己创造的“通信密码”（会话密钥）和想要获取的情报放在了“箱子A”里邮寄给了组织。</li>
+<li>组织收到了自己的“箱子A”，他用“钥匙A”打开了“箱子A”，取出了间谍创造的“通信密码”，通信密码只有七个字：“翻译成摩斯密码^v^”。</li>
+<li>在阅读了间谍的需求后，他们将间谍想要的消息翻译成了摩斯密码，然后发给了间谍。</li>
+</ol>
+<p>需要注意的是，每次HTTPS请求都会生成一个独立的会话密钥，所以如果后续间谍又有想要什么组织帮助的，就再这么折腾一轮。</p>
+]]></content>
+      <categories>
+        <category>计算机</category>
+      </categories>
+      <tags>
+        <tag>C#</tag>
+      </tags>
   </entry>
 </search>
