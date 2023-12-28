@@ -266,8 +266,23 @@
   <entry>
     <title>HTTP与HTTPS</title>
     <url>/2023/12/28/HTTP%E4%B8%8EHTTPS/</url>
-    <content><![CDATA[<h1 id="HTTP"><a href="#HTTP" class="headerlink" title="HTTP"></a>HTTP</h1><p>暂时不说</p>
-<h1 id="HTTPS"><a href="#HTTPS" class="headerlink" title="HTTPS"></a>HTTPS</h1><h2 id="HTTPS是什么？"><a href="#HTTPS是什么？" class="headerlink" title="HTTPS是什么？"></a>HTTPS是什么？</h2><p><strong>HTTPS 协议（HyperText Transfer Protocol over Secure Socket Layer）：可以理解为HTTP+SSL&#x2F;TLS，HTTPS中的“S”是指SSL，可以认为HTTPS是通过SSL加密后再用HTTP来传输的协议。</strong></p>
+    <content><![CDATA[<h1 id="HTTP"><a href="#HTTP" class="headerlink" title="HTTP"></a>HTTP</h1><h2 id="HTTPS是什么？"><a href="#HTTPS是什么？" class="headerlink" title="HTTPS是什么？"></a>HTTPS是什么？</h2><p>HTTP协议是超文本传输协议的缩写，英文是Hyper Text Transfer Protocol。它是从WEB服务器传输超文本标记语言(HTML)到本地浏览器的传送协议。<br>设计HTTP最初的目的是为了提供一种发布和接收HTML页面的方法。</p>
+<h2 id="HTTP原理"><a href="#HTTP原理" class="headerlink" title="HTTP原理"></a>HTTP原理</h2><p>HTTP是一个基于TCP&#x2F;IP通信协议来传递数据的协议，传输的数据类型为HTML 文件,、图片文件, 查询结果等。<br>HTTP协议一般用于B&#x2F;S架构。浏览器作为HTTP客户端通过URL向HTTP服务端即WEB服务器发送所有请求。</p>
+<h2 id="HTTP特点"><a href="#HTTP特点" class="headerlink" title="HTTP特点"></a>HTTP特点</h2><ol>
+<li>http协议支持客户端&#x2F;服务端模式，也是一种请求&#x2F;响应模式的协议。</li>
+<li>简单快速：客户向服务器请求服务时，只需传送请求方法和路径。请求方法常用的有GET、HEAD、POST。</li>
+<li>灵活：HTTP允许传输任意类型的数据对象。传输的类型由Content-Type加以标记。</li>
+<li>无连接：限制每次连接只处理一个请求。服务器处理完请求，并收到客户的应答后，即断开连接，但是却不利于客户端与服务器保持会话连接，为了弥补这种不足，产生了两项记录http状态的技术，一个叫做Cookie,一个叫做Session。</li>
+<li>无状态：无状态是指协议对于事务处理没有记忆，后续处理需要前面的信息，则必须重传。</li>
+</ol>
+<h2 id="HTTP请求方法"><a href="#HTTP请求方法" class="headerlink" title="HTTP请求方法"></a>HTTP请求方法</h2><ol>
+<li>GET:请求指定的页面信息，并返回实体主体。</li>
+<li>POST:向指定资源提交数据进行处理请求（例如提交表单或者上传文件）。数据被包含在请求体中。POST请求可能会导致新的资源的建立和&#x2F;或已有资源的修改。</li>
+<li>HEAD:类似于get请求，只不过返回的响应中没有具体的内容，用于获取报头</li>
+<li>PUT:从客户端向服务器传送的数据取代指定的文档的内容。</li>
+<li>DELETE:请求服务器删除指定的页面。</li>
+</ol>
+<h1 id="HTTPS"><a href="#HTTPS" class="headerlink" title="HTTPS"></a>HTTPS</h1><h2 id="HTTPS是什么？-1"><a href="#HTTPS是什么？-1" class="headerlink" title="HTTPS是什么？"></a>HTTPS是什么？</h2><p>HTTPS 协议（HyperText Transfer Protocol over Secure Socket Layer）：可以理解为HTTP+SSL&#x2F;TLS，HTTPS中的“S”是指SSL，可以认为HTTPS是通过SSL加密后再用HTTP来传输的协议。</p>
 <h3 id="SSL是什么，客户端和服务器之间传输数据时是怎么通过SSL加密的？"><a href="#SSL是什么，客户端和服务器之间传输数据时是怎么通过SSL加密的？" class="headerlink" title="SSL是什么，客户端和服务器之间传输数据时是怎么通过SSL加密的？"></a>SSL是什么，客户端和服务器之间传输数据时是怎么通过SSL加密的？</h3><p><strong>SSL（Secure Socket Layer，安全套接字层）：1994年为Netscape所研发，SSL协议位于TCP&#x2F;IP协议与各种应用层协议之间，为数据通讯提供安全支持，而客户端与服务器之间则是这么加密的：</strong></p>
 <ol>
 <li>首先客户端通过URL访问服务器建立SSL连接。</li>
@@ -287,7 +302,7 @@
 <p>需要注意的是，每次HTTPS请求都会生成一个独立的会话密钥，所以如果后续间谍又有想要什么组织帮助的，就再这么折腾一轮。</p>
 ]]></content>
       <categories>
-        <category>计算机</category>
+        <category>C#学习路线——HTTP与HTTPS</category>
       </categories>
       <tags>
         <tag>C#</tag>
