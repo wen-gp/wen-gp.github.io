@@ -163,23 +163,11 @@
 <div class="gallery-group-main">
 
   <figure class="gallery-group">
-  <img class="gallery-group-img no-lightbox" src='/image/%E9%A3%8E%E6%99%AF.jpg' alt="Group Image Gallery">
+  <img class="gallery-group-img no-lightbox" src='/image/%E4%BA%91%E5%A0%87.jpg' alt="Group Image Gallery">
   <figcaption>
-  <div class="gallery-group-name">广告</div>
-  <p>广告</p>
-  <a href='/video/%E5%B9%BF%E5%91%8A.mp4'></a>
-  </figcaption>
-  </figure>
-  
-</div>
-<div class="gallery-group-main">
-
-  <figure class="gallery-group">
-  <img class="gallery-group-img no-lightbox" src='/image/%E9%A3%8E%E6%99%AF.jpg' alt="Group Image Gallery">
-  <figcaption>
-  <div class="gallery-group-name">广告</div>
-  <p>广告</p>
-  <a href='/example/%E5%B9%BF%E5%91%8A.html'></a>
+  <div class="gallery-group-name">登记照</div>
+  <p>登记照</p>
+  <a href='/gallery/%E7%99%BB%E8%AE%B0%E7%85%A7'></a>
   </figcaption>
   </figure>
   
